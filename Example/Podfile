@@ -1,0 +1,14 @@
+use_frameworks!
+
+platform :ios, '9.0'
+
+target 'JGNetwork_Example' do
+  pod 'JGNetwork', :path => '../'
+
+  target 'JGNetwork_Tests' do
+    inherit! :search_paths
+
+pod 'AFNetworking', '~> 4.0'
+    
+  end
+end
