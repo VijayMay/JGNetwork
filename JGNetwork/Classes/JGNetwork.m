@@ -162,19 +162,61 @@ NSString *const kJGReturnMessage = @"returnMessage";
     return request;
 }
 
-+ (NSError *)checkServerResponse:(id)responseObject error:(NSError *)error {
+#pragma mark-文件上传
++ (NSURLSessionDataTask *)uploadFile:(NSData *)fileData
+                             apiPath:(NSString *)apiPath
+                                name:(NSString *)name
+                            fileName:(NSString *)fileName
+                          parameters:(id)parameters
+                     completionBlock:(JGServiceResponseBlock)completion
+                       progerssBlock:(void (^)(CGFloat progressValue))progress {
+    
+    AFHTTPSessionManager *sharedManager = [self.class sharedManager];
+    if (apiPath.length == 0) {
+        apiPath = [self.class defaultApiPath];
+    }
+    NSURL *url = [self baseURL];
+    if (apiPath.length > 0) {
+        url = [url URLByAppendingPathComponent:apiPath];
+    }
+    NSString *URLString = url.absoluteString;
+#if DEBUG
+    NSLog(@"\n===========request===========\n");
+    NSLog(@"请求URL:%@",URLString);
+    NSLog(@"=============分割线==============");
+    NSLog(@"请求参数:\n%@",parameters);
+    NSLog(@"=============分割线==============");
+    NSLog(@"\nuploadImageSize\n%@ : %.0f", fileName, (float)fileData.length/1024);
+#endif
+    NSURLSessionDataTask * task = [sharedManager POST:URLString parameters:parameters headers:nil constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+            [formData appendPartWithFileData:fileData name:name fileName:fileName mimeType:@"audio/x-pn-realaudio"];
+        } progress:^(NSProgress * _Nonnull uploadProgress) {
+            progress(uploadProgress.fractionCompleted);
+        } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+#if DEBUG
+            NSLog(@"\n===========response===========\nurl:%@\n%@",URLString, responseObject);
+#endif
+            NSError *serviceError = [self checkServerResponse:responseObject error:nil];
+            if (serviceError) {
+                completion(responseObject, serviceError);
+            } else {
+                completion([self analyticWithResponseObject:responseObject], nil);
+            }
+        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+#if DEBUG
+            NSLog(@"\n===========response===========\nurl:%@\n%@",URLString, error);
+#endif
+            completion(nil,error);
+        }];
+    [task resume];
+    
+    return task;
+}
++ (NSError *)checkServerResponse:(id)responseObject error:(NSError * __nullable)error {
     if (responseObject == nil || [responseObject isKindOfClass:[NSNull class]]) {
-        NSAssert(@"Response Object Can't be empty ", nil);
+        NSLog(@"Response Object Can't be empty ");
     }
     //需要针对服务器返回的errorCode解析异常统一处理或由子类重写。
-    /*
-    NSDictionary *userInfo = @{NSLocalizedDescriptionKey:responseObject[kReturnMessage]};
-    NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain
-                                         code:[responseObject[kReturnCode] integerValue]
-                                     userInfo:userInfo];
-    
-    return error;
-     */
     return nil;
 }
 

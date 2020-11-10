@@ -84,12 +84,31 @@ typedef void (^JGServiceResponseBlock)(id __nullable responseObject, NSError *__
 
 
 /**
+ 文件上传
+
+ @param fileData 参数
+ @param apiPath API地址
+ @param name 服务器用来解析的字段区分用途
+ @param fileName 文件名
+ @param parameters 请求参数
+ @param completion  返回(JGServiceResponseBlock)
+ @param progress 下载进度
+ */
++ (NSURLSessionDataTask *)uploadFile:(NSData *)fileData
+                             apiPath:(NSString *)apiPath
+                                name:(NSString *)name
+                            fileName:(NSString *)fileName
+                          parameters:(id)parameters
+                     completionBlock:(JGServiceResponseBlock)completion
+                       progerssBlock:(void (^)(CGFloat progressValue))progress;
+
+/**
  必须要重写的NSError处理方法
 
  @param responseObject responseObject
  @return 返回NSError对象
  */
-+ (NSError *)checkServerResponse:(id)responseObject error:(NSError *)error;
++ (NSError *)checkServerResponse:(id)responseObject error:(NSError * __nullable)error;
 
 
 /**
