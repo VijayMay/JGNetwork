@@ -114,15 +114,16 @@ NSString *const kJGReturnMessage = @"returnMessage";
     
     AFHTTPSessionManager *sharedManager = [self.class sharedManager];
 #if DEBUG
+    NSLog(@"\n===========request===========\n");
     NSLog(@"请求URL:%@",request.URL);
-    NSLog(@"============分割线=============");
-    NSLog(@"请求头:\n%@",request.allHTTPHeaderFields);
-    NSLog(@"============分割线=============");
+    NSLog(@"=============分割线==============");
+    NSLog(@"请求参数:\n%@",parameters);
+    NSLog(@"=============分割线==============");
 #endif
     NSURLSessionDataTask *task = [sharedManager dataTaskWithRequest:request uploadProgress:nil downloadProgress:nil completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
 #if DEBUG
-            NSLog(@"响应responseObject:\n%@",responseObject);
-            NSLog(@"错误error:\n%@",error);
+            NSLog(@"\n===========response===========\nurl:%@\n%@",request.URL, responseObject);
+            NSLog(@"error:\n%@",error);
 #endif
             if (block) {
                 NSError *serviceError = [self checkServerResponse:responseObject error:error];
