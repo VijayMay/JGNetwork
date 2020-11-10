@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'JGNetwork'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'JGNetwork是一个基于AFNetworking二次封装的基础库'
 
 # This description is used to generate tags and improve search results.
